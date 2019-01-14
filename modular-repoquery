@@ -1,0 +1,3 @@
+#!/bin/bash
+
+for i in $(dnf --setopt=updates-modular.module_hotfixes=true --setopt=fedora-modular.module_hotfixes=true repoquery $*); do echo "$i $(dnf --setopt=updates-modular.module_hotfixes=true --setopt=fedora-modular.module_hotfixes=true module provides $i | grep "^Module" | sed 's/^Module *: *\(.*:.*\).*$/(\1)/' | sort -u | xargs)" ; done
