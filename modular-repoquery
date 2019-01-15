@@ -7,6 +7,9 @@ REPO_OPTIONS="--setopt=updates-modular.module_hotfixes=true --setopt=fedora-modu
 # When querying different repositories than the system ones, I need to set those to the second dnf command as well, so I'm saving them here.
 REPOS="$(echo $* | tr ' ' '\n' | grep "\-\-repo=" | xargs)"
 
+#FIXME: When working with differnet repos, dnf my complain about non-existing platform.
+#       To get rid of the error, I can set "--setopt=module_platform_id=platform:f30".
+
 # Prints a list of RPMs and the module(s) they're part of
 while read -r i; do
     # Performance tweak: only check the module when the package looks like it's coming from one
