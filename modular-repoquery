@@ -1,12 +1,13 @@
 #!/bin/bash
 
-REPO_OPTIONS="--setopt=updates-modular.module_hotfixes=true --setopt=fedora-modular.module_hotfixes=true"
 
-cat /etc/fedora-release | grep "Rawhide"
-if [ $? -eq 0 ]; then
-    REPO_OPTIONS="--setopt=rawhide-modular.module_hotfixes=true"
-fi
+# This workaround makes DNF to see RPMs in all module streams, not just the default or enabled ones.
+REPO_OPTIONS="--setopt=updates-modular.module_hotfixes=true --setopt=fedora-modular.module_hotfixes=true --setopt=rawhide-modular.module_hotfixes=true"
 
+# When querying different repositories than the system ones, I need to set those to the second dnf command as well, so I'm saving them here.
+REPOS="$(echo $* | tr ' ' '\n' | grep "\-\-repo=" | xargs)"
+
+# Prints a list of RPMs and the module(s) they're part of
 for i in $(dnf $REPO_OPTIONS repoquery $*); do
-    echo "$i $(dnf $REPO_OPTIONS module provides $i | grep "^Module" | sed 's/^Module *: *\(.*:.*\).*$/(\1)/' | sort -u | xargs)"
+    echo "$i $(dnf $REPOS $REPO_OPTIONS module provides $i | grep "^Module" | sed 's/^Module *: *\(.*:.*\).*$/(\1)/' | sort -u | xargs)"
 done
