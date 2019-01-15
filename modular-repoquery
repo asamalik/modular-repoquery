@@ -9,5 +9,10 @@ REPOS="$(echo $* | tr ' ' '\n' | grep "\-\-repo=" | xargs)"
 
 # Prints a list of RPMs and the module(s) they're part of
 for i in $(dnf $REPO_OPTIONS repoquery $*); do
-    echo "$i $(dnf $REPOS $REPO_OPTIONS module provides $i | grep "^Module" | sed 's/^Module *: *\(.*:.*\).*$/(\1)/' | sort -u | xargs)"
+    # Performance tweak: only check the module when the package looks like it's coming from one
+    if [[ $i == *".module_"* ]]; then
+        echo "$i $(dnf $REPOS $REPO_OPTIONS module provides $i | grep "^Module" | sed 's/^Module *: *\(.*:.*\).*$/(\1)/' | sort -u | xargs)"
+    else
+        echo "$i"
+    fi
 done
